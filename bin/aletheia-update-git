@@ -1,0 +1,15 @@
+#!/bin/bash
+
+set -e
+
+echo -e "\e[32mUpdate Aletheia\e[0m"
+
+aletheia-update-time
+
+# Suppress Hyprland config errors while git updates default config files mid-pull
+hyprctl keyword debug:suppress_errors true &>/dev/null || true
+
+git -C $ALETHEIA_PATH pull --autostash
+git -C $ALETHEIA_PATH --no-pager diff --check || git -C $ALETHEIA_PATH reset --merge
+
+hyprctl reload &>/dev/null || true

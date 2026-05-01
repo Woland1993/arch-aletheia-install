@@ -1,0 +1,56 @@
+#!/bin/bash
+
+app_id=""
+title=""
+workdir=""
+cmd=()
+
+while (($# > 0)); do
+  case "$1" in
+  --print-id)
+    echo "Alacritty"
+    exit 0
+    ;;
+  --app-id=*)
+    app_id="${1#--app-id=}"
+    shift
+    ;;
+  --app-id)
+    app_id="$2"
+    shift 2
+    ;;
+  --title=*)
+    title="${1#--title=}"
+    shift
+    ;;
+  --title)
+    title="$2"
+    shift 2
+    ;;
+  --dir=*)
+    workdir="${1#--dir=}"
+    shift
+    ;;
+  --dir)
+    workdir="$2"
+    shift 2
+    ;;
+  -e)
+    shift
+    cmd=("$@")
+    break
+    ;;
+  *)
+    cmd=("$@")
+    break
+    ;;
+  esac
+done
+
+args=()
+[[ -n $app_id ]] && args+=(--class "$app_id")
+[[ -n $title ]] && args+=(--title "$title")
+[[ -n $workdir ]] && args+=(--working-directory "$workdir")
+((${#cmd[@]} > 0)) && args+=(-e "${cmd[@]}")
+
+exec alacritty "${args[@]}"

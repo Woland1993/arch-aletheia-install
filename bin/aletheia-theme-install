@@ -1,0 +1,32 @@
+#!/bin/bash
+
+# aletheia-theme-install: Install a new theme from a git repo for Aletheia
+# Usage: aletheia-theme-install <git-repo-url>
+
+if [[ -z $1 ]]; then
+  REPO_URL=$(gum input --placeholder="Git repo URL for theme" --header="")
+else
+  REPO_URL="$1"
+fi
+
+if [[ -z $REPO_URL ]]; then
+  exit 1
+fi
+
+THEMES_DIR="$HOME/.config/aletheia/themes"
+THEME_NAME=$(basename "$REPO_URL" .git | sed -E 's/^aletheia-//; s/-theme$//' | tr '[:upper:]' '[:lower:]')
+THEME_PATH="$THEMES_DIR/$THEME_NAME"
+
+# Remove existing theme if present
+if [[ -d $THEME_PATH ]]; then
+  rm -rf "$THEME_PATH"
+fi
+
+# Clone the repo directly to ~/.config/aletheia/themes
+if ! git clone "$REPO_URL" "$THEME_PATH"; then
+  echo "Error: Failed to clone theme repo."
+  exit 1
+fi
+
+# Apply the new theme with aletheia-theme-set
+aletheia-theme-set $THEME_NAME

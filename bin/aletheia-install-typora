@@ -1,0 +1,46 @@
+#!/bin/bash
+
+set -e
+
+case "$(uname -m)" in
+x86_64) archive="Typora-linux-x64.tar.gz" ;;
+aarch64) archive="Typora-linux-arm64.tar.gz" ;;
+*)
+  echo "Unsupported architecture: $(uname -m)"
+  exit 1
+  ;;
+esac
+
+tmp_dir=$(mktemp -d)
+trap 'rm -rf "$tmp_dir"' EXIT
+
+if curl -fsSLo "$tmp_dir/$archive" "https://typora.io/linux/$archive" &&
+  tar -xf "$tmp_dir/$archive" -C "$tmp_dir" &&
+  sudo rm -rf /opt/Typora &&
+  sudo mkdir -p /opt/Typora &&
+  sudo cp -a "$tmp_dir"/Typora-linux-*/* /opt/Typora/ &&
+  sudo ln -snf /opt/Typora/Typora /usr/local/bin/typora; then
+  sudo mkdir -p /usr/local/share/applications
+  sudo tee /usr/local/share/applications/typora.desktop >/dev/null <<EOF
+[Desktop Entry]
+Name=Typora
+Exec=typora --enable-wayland-ime %U
+Icon=typora
+Type=Application
+Terminal=false
+MimeType=text/markdown;text/x-markdown;
+Categories=Office;WordProcessor;
+EOF
+
+  mkdir -p ~/.config/Typora/themes
+  cp -a "$ALETHEIA_PATH"/config/Typora/themes/. ~/.config/Typora/themes/
+  mkdir -p ~/.config/Typora/conf
+  cp "$ALETHEIA_PATH"/config/Typora/conf/conf.user.json ~/.config/Typora/conf/conf.user.json
+else
+  if aletheia-pkg-aur-helper &>/dev/null; then
+    aletheia-pkg-aur-add typora
+  else
+    echo "Typora official install failed and no AUR helper is available" >&2
+    exit 1
+  fi
+fi

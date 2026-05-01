@@ -1,0 +1,11 @@
+#!/bin/bash
+
+# Set the correct power profile on boot based on current AC/battery state.
+# The udev rules only fire on state *changes*, so without this, booting
+# on AC leaves you in the default balanced mode.
+
+if aletheia-battery-present && ! aletheia-ac-present; then
+  aletheia-powerprofiles-set battery
+else
+  aletheia-powerprofiles-set ac
+fi

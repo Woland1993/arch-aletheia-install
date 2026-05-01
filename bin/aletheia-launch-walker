@@ -1,0 +1,20 @@
+#!/bin/bash
+
+# Launch the Walker application launcher while ensuring that it's data provider (called elephant) is running first.
+
+if ! command -v walker &>/dev/null; then
+  notify-send "Walker is not installed" "Install a launcher or restore the walker package in your GitHub repo."
+  exit 1
+fi
+
+# Ensure elephant is running before launching walker
+if command -v elephant &>/dev/null && ! pgrep -x elephant > /dev/null; then
+  setsid uwsm-app -- elephant &
+fi
+
+# Ensure walker service is running
+if ! pgrep -f "walker --gapplication-service" > /dev/null; then
+  setsid uwsm-app -- env GSK_RENDERER=cairo walker --gapplication-service &
+fi
+
+exec walker --width 644 --maxheight 300 --minheight 300 "$@"

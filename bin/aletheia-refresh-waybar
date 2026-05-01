@@ -1,0 +1,7 @@
+#!/bin/bash
+
+# Overwrite the user configs for the Waybar menu bar with the Aletheia defaults and restart the service.
+
+aletheia-refresh-config waybar/config.jsonc
+aletheia-refresh-config waybar/style.css
+aletheia-restart-waybar

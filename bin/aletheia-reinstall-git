@@ -1,0 +1,15 @@
+#!/bin/bash
+set -e
+
+# Reinstall the Aletheia configuration directory from the configured git source.
+
+repo_url=$(git -C "$ALETHEIA_PATH" config --get remote.origin.url)
+
+if [[ -z $repo_url ]]; then
+  echo "No git remote found for $ALETHEIA_PATH"
+  exit 1
+fi
+
+git clone --depth=1 "$repo_url" ~/.local/share/aletheia-new >/dev/null
+mv $ALETHEIA_PATH ~/.local/share/aletheia-old
+mv ~/.local/share/aletheia-new $ALETHEIA_PATH

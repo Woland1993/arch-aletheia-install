@@ -1,0 +1,20 @@
+#!/bin/bash
+
+# Set the Aletheia Git branch. Package repositories are managed by the system's
+# existing pacman configuration, not by Aletheia channels.
+
+if (($# == 0)); then
+  echo "Usage: aletheia-channel-set [stable|rc|dev]"
+  exit 1
+else
+  channel="$1"
+fi
+
+case "$channel" in
+"stable") aletheia-branch-set "master" ;;
+"rc") aletheia-branch-set "rc" ;;
+"dev") aletheia-branch-set "dev" ;;
+*) echo "Unknown channel: $channel"; exit 1; ;;
+esac
+
+aletheia-update -y

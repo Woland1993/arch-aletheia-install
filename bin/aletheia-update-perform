@@ -1,0 +1,21 @@
+#!/bin/bash
+
+set -e
+
+# Ensure screensaver/sleep doesn't set in during updates
+hyprctl dispatch tagwindow +noidle &>/dev/null || true
+
+# Perform all update steps
+aletheia-update-keyring
+aletheia-update-available-reset
+aletheia-update-system-pkgs
+aletheia-migrate
+aletheia-update-orphan-pkgs
+aletheia-hook post-update
+
+aletheia-update-analyze-logs
+
+aletheia-update-restart
+
+# Re-enable screensaver/sleep after updates
+hyprctl dispatch tagwindow -- -noidle &>/dev/null || true

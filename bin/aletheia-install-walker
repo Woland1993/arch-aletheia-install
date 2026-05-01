@@ -1,0 +1,26 @@
+#!/bin/bash
+
+set -e
+
+if aletheia-pkg-aur-helper &>/dev/null; then
+  aletheia-pkg-aur-add \
+    walker-bin \
+    elephant-bin \
+    elephant-archlinuxpkgs-bin \
+    elephant-providerlist-bin \
+    elephant-desktopapplications-bin \
+    elephant-files-bin \
+    elephant-calc-bin \
+    elephant-symbols-bin \
+    elephant-clipboard-bin \
+    elephant-websearch-bin \
+    elephant-menus-bin \
+    elephant-runner-bin
+else
+  echo "Walker requires an AUR helper (yay or paru)" >&2
+  exit 1
+fi
+
+if command -v walker &>/dev/null; then
+  bash "$ALETHEIA_PATH/install/config/walker-elephant.sh"
+fi

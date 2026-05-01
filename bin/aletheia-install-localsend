@@ -1,0 +1,38 @@
+#!/bin/bash
+
+set -e
+
+aletheia-pkg-add curl jq fuse2
+
+mkdir -p ~/.local/bin ~/.local/share/applications ~/.local/share/applications/icons
+
+if release_json=$(curl -fsSL https://api.github.com/repos/localsend/localsend/releases/latest) &&
+  asset_url=$(jq -r '.assets[] | select(.name | test("linux-x86-64[.]AppImage$")) | .browser_download_url' <<<"$release_json" | head -1) &&
+  [[ -n $asset_url && $asset_url != "null" ]] &&
+  curl -fsSLo ~/.local/bin/localsend "$asset_url"; then
+  chmod +x ~/.local/bin/localsend
+else
+  if aletheia-pkg-aur-helper &>/dev/null; then
+    aletheia-pkg-aur-add localsend
+    exit 0
+  fi
+  echo "LocalSend official install failed and no AUR helper is available" >&2
+  exit 1
+fi
+
+icon="$ALETHEIA_PATH/applications/icons/localsend.png"
+[[ -f $icon ]] || icon=localsend
+
+cat >~/.local/share/applications/localsend.desktop <<EOF
+[Desktop Entry]
+Version=1.0
+Name=LocalSend
+Comment=Share files to nearby devices
+Exec=$HOME/.local/bin/localsend
+Terminal=false
+Type=Application
+Icon=$icon
+StartupNotify=true
+EOF
+
+chmod +x ~/.local/share/applications/localsend.desktop

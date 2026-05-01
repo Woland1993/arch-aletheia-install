@@ -1,0 +1,33 @@
+#!/bin/bash
+
+# Remove preinstalled Aletheia applications (web apps, TUIs, and selected packages).
+# This removes all web apps, TUIs, plus specific desktop applications.
+
+if gum confirm "Are you sure you want to remove all preinstalled web apps, TUI wrappers, and desktop applications?"; then
+  echo -e "Removing preinstalled Aletheia applications...\n"
+
+  aletheia-webapp-remove-all
+  aletheia-tui-remove-all
+
+  cp ~/.config/hypr/bindings.conf ~/.config/hypr/bindings.conf.bak
+  cp "$ALETHEIA_PATH/default/hypr/plain-bindings.conf" ~/.config/hypr/bindings.conf
+  hyprctl reload
+
+  # Remove npx stubs
+  rm -f ~/.local/bin/codex ~/.local/bin/gemini ~/.local/bin/copilot \
+       ~/.local/bin/opencode ~/.local/bin/playwright-cli ~/.local/bin/pi
+  rm -f ~/.local/bin/localsend
+  sudo rm -rf /opt/1Password /opt/Typora
+  sudo rm -f /usr/local/bin/typora /usr/local/share/applications/typora.desktop
+  flatpak uninstall -y com.github.PintaProject.Pinta 2>/dev/null || true
+  pipx uninstall terminaltexteffects 2>/dev/null || true
+
+  aletheia-pkg-drop \
+    libreoffice-fresh \
+    xournalpp \
+    signal-desktop \
+    obsidian \
+    obs-studio \
+    kdenlive \
+    lazydocker
+fi

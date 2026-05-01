@@ -1,0 +1,10 @@
+<svg viewBox="0 0 1000 350" xmlns="http://www.w3.org/2000/svg">
+    <!-- Texto centrado dinámicamente que ocupa todo el espacio del viewBox (sin márgenes) -->
+    <text x="500%" y="300%"
+          font-family="Linux Libertine"
+          font-size="180" 
+          letter-spacing="15" 
+          fill="#ffffff" 
+          text-anchor="middle" 
+          dominant-baseline="central">ALETHEIA</text>
+</svg>

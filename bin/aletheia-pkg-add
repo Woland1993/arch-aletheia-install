@@ -1,0 +1,36 @@
+#!/bin/bash
+
+# Add the named packages to the system if they're missing. Returns false if it couldn't be done.
+
+packages=()
+missing=()
+
+for pkg in "$@"; do
+  if pacman -Si "$pkg" &>/dev/null; then
+    packages+=("$pkg")
+  else
+    missing+=("$pkg")
+  fi
+done
+
+if ((${#missing[@]} > 0)); then
+  echo -e "\033[33mSkipping unavailable packages: ${missing[*]}\033[0m" >&2
+fi
+
+if ((${#packages[@]} == 0)); then
+  exit 0
+fi
+
+if aletheia-pkg-missing "${packages[@]}"; then
+  sudo pacman -S --noconfirm --needed "${packages[@]}" || exit 1
+fi
+
+for pkg in "${packages[@]}"; do
+  # Secondary check to handle states where pacman doesn't actually register an error
+  if ! pacman -Q "$pkg" &>/dev/null; then
+    echo -e "\033[31mError: Package '$pkg' did not install\033[0m" >&2
+    exit 1
+  fi
+done
+
+exit 0

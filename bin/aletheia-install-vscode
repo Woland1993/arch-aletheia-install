@@ -1,0 +1,68 @@
+#!/bin/bash
+
+# Install VSCode and configure it to use the gnome-libsecret password store, not to update automatically, and to use the current Aletheia theme.
+
+echo "Installing VSCode..."
+case "$(uname -m)" in
+x86_64) platform=linux-x64 ;;
+aarch64) platform=linux-arm64 ;;
+armv7l | armv6l) platform=linux-armhf ;;
+*)
+  echo "Unsupported architecture: $(uname -m)"
+  exit 1
+  ;;
+esac
+
+tmp_dir=$(mktemp -d)
+trap 'rm -rf "$tmp_dir"' EXIT
+
+if curl -fsSLo "$tmp_dir/vscode.tar.gz" "https://update.code.visualstudio.com/latest/$platform/stable" &&
+  tar -xf "$tmp_dir/vscode.tar.gz" -C "$tmp_dir" &&
+  sudo rm -rf /opt/VSCode &&
+  sudo mkdir -p /opt/VSCode &&
+  sudo cp -a "$tmp_dir"/VSCode-linux-*/* /opt/VSCode/ &&
+  sudo ln -snf /opt/VSCode/bin/code /usr/local/bin/code; then
+  sudo mkdir -p /usr/local/share/applications
+  sudo tee /usr/local/share/applications/code.desktop >/dev/null <<EOF
+[Desktop Entry]
+Name=Visual Studio Code
+Comment=Code Editing. Redefined.
+Exec=code --password-store=gnome-libsecret --no-sandbox %F
+Icon=/opt/VSCode/resources/app/resources/linux/code.png
+Type=Application
+StartupNotify=true
+StartupWMClass=Code
+Categories=TextEditor;Development;IDE;
+MimeType=text/plain;inode/directory;
+EOF
+else
+  if aletheia-pkg-aur-helper &>/dev/null; then
+    aletheia-pkg-aur-add visual-studio-code-bin
+  else
+    echo "VS Code official install failed and no AUR helper is available" >&2
+    exit 1
+  fi
+fi
+
+mkdir -p ~/.vscode ~/.config/Code/User
+
+cat > ~/.vscode/argv.json << 'EOF'
+// This configuration file allows you to pass permanent command line arguments to VS Code.
+// Only a subset of arguments is currently supported to reduce the likelihood of breaking
+// the installation.
+//
+// PLEASE DO NOT CHANGE WITHOUT UNDERSTANDING THE IMPACT
+//
+// NOTE: Changing this file requires a restart of VS Code.
+{
+  "password-store":"gnome-libsecret"
+}
+EOF
+
+# Ensure VSC's own auto-update feature is turned off
+printf '{\n  "update.mode": "none"\n}\n' > ~/.config/Code/User/settings.json
+
+# Apply Aletheia theme to VSCode
+aletheia-theme-set-vscode
+
+setsid gtk-launch code.desktop

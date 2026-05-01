@@ -1,0 +1,22 @@
+#!/bin/bash
+
+set -e
+
+aletheia-pkg-add flatpak
+
+if ! flatpak remote-list --columns=name | grep -qx flathub; then
+  flatpak remote-add --if-not-exists flathub https://flathub.org/repo/flathub.flatpakrepo
+fi
+
+if flatpak install -y flathub com.github.PintaProject.Pinta; then
+  mkdir -p ~/.config/Pinta ~/.var/app/com.github.PintaProject.Pinta/config/Pinta
+  cp "$ALETHEIA_PATH"/config/Pinta/* ~/.config/Pinta/
+  cp "$ALETHEIA_PATH"/config/Pinta/* ~/.var/app/com.github.PintaProject.Pinta/config/Pinta/
+else
+  if aletheia-pkg-aur-helper &>/dev/null; then
+    aletheia-pkg-aur-add pinta
+  else
+    echo "Pinta official install failed and no AUR helper is available" >&2
+    exit 1
+  fi
+fi

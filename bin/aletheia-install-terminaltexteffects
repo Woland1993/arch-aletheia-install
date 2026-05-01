@@ -1,0 +1,16 @@
+#!/bin/bash
+
+set -e
+
+aletheia-pkg-add python-pipx
+
+if pipx ensurepath && pipx install terminaltexteffects; then
+  exit 0
+fi
+
+if aletheia-pkg-aur-helper &>/dev/null; then
+  aletheia-pkg-aur-add python-terminaltexteffects
+else
+  echo "TerminalTextEffects install failed and no AUR helper is available" >&2
+  exit 1
+fi

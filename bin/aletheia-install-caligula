@@ -1,0 +1,5 @@
+#!/bin/bash
+
+set -e
+
+aletheia-pkg-add caligula

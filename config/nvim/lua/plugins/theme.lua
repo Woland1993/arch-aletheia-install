@@ -1,0 +1,1 @@
+/home/conato/.config/omarchy/current/theme/neovim.lua

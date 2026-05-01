@@ -1,0 +1,6 @@
+source ~/.local/share/aletheia/default/bash/envs
+source ~/.local/share/aletheia/default/bash/shell
+source ~/.local/share/aletheia/default/bash/aliases
+source ~/.local/share/aletheia/default/bash/functions
+source ~/.local/share/aletheia/default/bash/init
+[[ $- == *i* ]] && bind -f ~/.local/share/aletheia/default/bash/inputrc

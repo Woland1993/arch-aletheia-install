@@ -1,0 +1,22 @@
+#!/bin/bash
+set -e
+
+# Overwrite all user configs with the Aletheia defaults.
+
+if (( EUID == 0 )); then
+  echo "Error: This script should not be run as root"
+  exit 1
+fi
+
+echo "Resetting all Aletheia configs"
+cp -R ~/.local/share/aletheia/config/* ~/.config/
+cp ~/.local/share/aletheia/default/bashrc ~/.bashrc
+echo '[[ -f ~/.bashrc ]] && . ~/.bashrc' | tee ~/.bash_profile >/dev/null
+
+$(bash $ALETHEIA_PATH/install/config/theme.sh)
+
+aletheia-refresh-limine
+aletheia-refresh-plymouth
+if command -v aletheia-nvim-setup &>/dev/null; then
+  aletheia-nvim-setup
+fi

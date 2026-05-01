@@ -1,0 +1,4 @@
+#!/bin/bash
+
+# Refresh package databases using the system's existing pacman.conf and mirrorlist.
+sudo pacman -Syyu --noconfirm

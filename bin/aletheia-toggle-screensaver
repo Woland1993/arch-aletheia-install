@@ -1,0 +1,6 @@
+#!/bin/bash
+
+aletheia-toggle \
+  --enabled-notification "󱄄   Screensaver disabled" \
+  --disabled-notification "󱄄   Screensaver enabled" \
+  screensaver-off

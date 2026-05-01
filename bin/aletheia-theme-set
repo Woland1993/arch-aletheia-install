@@ -1,0 +1,60 @@
+#!/bin/bash
+
+if [[ -z $1 ]]; then
+  echo "Usage: aletheia-theme-set <theme-name>"
+  exit 1
+fi
+
+CURRENT_THEME_PATH="$HOME/.config/aletheia/current/theme"
+NEXT_THEME_PATH="$HOME/.config/aletheia/current/next-theme"
+USER_THEMES_PATH="$HOME/.config/aletheia/themes"
+ALETHEIA_THEMES_PATH="$ALETHEIA_PATH/themes"
+
+THEME_NAME=$(echo "$1" | sed -E 's/<[^>]+>//g' | tr '[:upper:]' '[:lower:]' | tr ' ' '-')
+
+if [[ ! -d $ALETHEIA_THEMES_PATH/$THEME_NAME ]] && [[ ! -d $USER_THEMES_PATH/$THEME_NAME ]]; then
+  echo "Theme '$THEME_NAME' does not exist"
+  exit 1
+fi
+
+# Setup clean next theme directory (for atomic theme config swapping)
+rm -rf "$NEXT_THEME_PATH"
+mkdir -p "$NEXT_THEME_PATH"
+
+# Copy official theme first, then overlay user customizations on top
+cp -r "$ALETHEIA_THEMES_PATH/$THEME_NAME/"* "$NEXT_THEME_PATH/" 2>/dev/null
+cp -r "$USER_THEMES_PATH/$THEME_NAME/"* "$NEXT_THEME_PATH/" 2>/dev/null
+
+# Generate dynamic configs
+aletheia-theme-set-templates
+
+# Swap next theme in as current
+rm -rf "$CURRENT_THEME_PATH"
+mv "$NEXT_THEME_PATH" "$CURRENT_THEME_PATH"
+
+# Store theme name for reference
+echo "$THEME_NAME" >"$HOME/.config/aletheia/current/theme.name"
+
+# Change background with theme
+aletheia-theme-bg-next
+
+# Restart components to apply new theme
+if pgrep -x waybar >/dev/null; then
+  aletheia-restart-waybar
+fi
+aletheia-restart-swayosd
+aletheia-restart-terminal
+aletheia-restart-hyprctl
+aletheia-restart-btop
+aletheia-restart-opencode
+aletheia-restart-mako
+
+# Change app-specific themes
+aletheia-theme-set-gnome
+aletheia-theme-set-browser
+aletheia-theme-set-vscode
+aletheia-theme-set-obsidian
+aletheia-theme-set-keyboard
+
+# Call hook on theme set
+aletheia-hook theme-set "$THEME_NAME"

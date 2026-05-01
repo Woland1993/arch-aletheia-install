@@ -1,0 +1,6 @@
+#!/bin/bash
+
+# Overwrite the user config for hyprsunset with the Aletheia default and restart the service.
+#
+aletheia-refresh-config hypr/hyprsunset.conf
+aletheia-restart-hyprsunset

@@ -1,0 +1,11 @@
+#!/bin/bash
+
+# Toggle microphone mute. Dell XPS and ThinkPad systems get special handling for the hardware LED.
+
+if aletheia-hw-match "XPS"; then
+  aletheia-cmd-mic-mute-xps
+elif aletheia-hw-match "ThinkPad"; then
+  aletheia-cmd-mic-mute-thinkpad
+else
+  aletheia-swayosd-client --input-volume mute-toggle
+fi

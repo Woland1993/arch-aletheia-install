@@ -1,0 +1,3 @@
+#!/bin/bash
+
+aletheia-restart-app waybar

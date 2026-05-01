@@ -1,0 +1,11 @@
+# Changes require a restart to take effect.
+
+# Ensure Aletheia bins are in the path
+export ALETHEIA_PATH=$HOME/.local/share/aletheia
+export PATH=$ALETHEIA_PATH/bin:$PATH:$HOME/.local/bin
+
+# Set default terminal and editor
+source ~/.config/uwsm/default
+
+# Activate mise if present on the system
+aletheia-cmd-present mise && eval "$(mise activate bash --shims)"
