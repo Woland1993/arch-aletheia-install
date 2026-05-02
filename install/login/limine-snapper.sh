@@ -1,10 +1,5 @@
 if command -v limine &>/dev/null; then
-  if ! pacman -Si limine-snapper-sync limine-mkinitcpio-hook &>/dev/null; then
-    echo "Skipping Limine setup: limine-snapper-sync packages are unavailable in configured pacman repositories"
-    exit 0
-  fi
-
-  sudo pacman -S --noconfirm --needed limine-snapper-sync limine-mkinitcpio-hook
+  aletheia-pkg-aur-add limine-snapper-sync limine-mkinitcpio-hook
 
   sudo tee /etc/mkinitcpio.conf.d/aletheia_hooks.conf <<EOF >/dev/null
 HOOKS=(base udev plymouth keyboard autodetect microcode modconf kms keymap consolefont block encrypt filesystems fsck btrfs-overlayfs)
