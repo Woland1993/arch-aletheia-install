@@ -1,5 +1,7 @@
 #!/bin/bash
 
+set -eEo pipefail
+
 # Set install mode to online since boot.sh is used for curl installations
 export ALETHEIA_ONLINE_INSTALL=true
 
@@ -21,18 +23,41 @@ ALETHEIA_REF="${ALETHEIA_REF:-master}"
 sudo pacman -Syu --noconfirm --needed git
 
 if [[ -z ${ALETHEIA_REPO:-} ]]; then
-  echo "Set ALETHEIA_REPO to your GitHub repo, e.g. owner/aletheia"
+  echo "Set ALETHEIA_REPO to your repo, e.g. owner/aletheia"
   exit 1
 fi
 
-echo -e "\nCloning Aletheia from: https://github.com/${ALETHEIA_REPO}.git"
-rm -rf ~/.local/share/aletheia/
-git clone "https://github.com/${ALETHEIA_REPO}.git" ~/.local/share/aletheia >/dev/null
+case "$ALETHEIA_REPO" in
+http://* | https://* | git@* | ssh://* | file://* | /* | ./* | ../*)
+  clone_url="$ALETHEIA_REPO"
+  ;;
+*)
+  clone_url="https://github.com/${ALETHEIA_REPO%.git}.git"
+  ;;
+esac
+
+target_dir="$HOME/.local/share/aletheia"
+mkdir -p "$HOME/.local/share"
+tmp_dir=$(mktemp -d "$HOME/.local/share/aletheia.XXXXXX")
+trap 'rm -rf "$tmp_dir"' EXIT
+
+echo -e "\nCloning Aletheia from: $clone_url"
+git clone "$clone_url" "$tmp_dir"
 
 echo -e "\e[32mUsing branch: $ALETHEIA_REF\e[0m"
-cd ~/.local/share/aletheia
+cd "$tmp_dir"
 git fetch origin "${ALETHEIA_REF}" && git checkout "${ALETHEIA_REF}"
 cd -
 
+if [[ ! -f "$tmp_dir/install.sh" ]]; then
+  echo "Error: install.sh was not found at the root of $clone_url on ref $ALETHEIA_REF." >&2
+  echo "Check ALETHEIA_REPO and ALETHEIA_REF." >&2
+  exit 1
+fi
+
+rm -rf "$target_dir"
+mv "$tmp_dir" "$target_dir"
+trap - EXIT
+
 echo -e "\nInstallation starting..."
-source ~/.local/share/aletheia/install.sh
+source "$target_dir/install.sh"
