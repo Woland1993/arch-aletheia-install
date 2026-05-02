@@ -1,0 +1,16 @@
+#!/bin/bash
+
+set -e
+
+aletheia_path=${ALETHEIA_PATH:-$(cd "$(dirname "${BASH_SOURCE[0]}")/.." && pwd)}
+source_dir="$aletheia_path/default/tobi-try"
+
+if [[ ! -f $source_dir/try.rb ]]; then
+  echo "Missing bundled tobi-try sources in $source_dir" >&2
+  exit 1
+fi
+
+sudo install -Dm755 "$source_dir/try.rb" /usr/local/lib/tobi-try/try.rb
+sudo install -Dm644 "$source_dir/lib/fuzzy.rb" /usr/local/lib/tobi-try/lib/fuzzy.rb
+sudo install -Dm644 "$source_dir/lib/tui.rb" /usr/local/lib/tobi-try/lib/tui.rb
+sudo ln -snf /usr/local/lib/tobi-try/try.rb /usr/local/bin/try

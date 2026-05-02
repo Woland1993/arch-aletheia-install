@@ -2,10 +2,10 @@
 
 # Show a fuzzy-finder TUI for picking new AUR packages to install.
 
-aur_helper=$(aletheia-pkg-aur-helper 2>/dev/null) || {
-  echo "No AUR helper found (need yay or paru)" >&2
-  exit 1
-}
+if ! aur_helper=$(aletheia-pkg-aur-helper 2>/dev/null); then
+  aletheia-pkg-aur-helper --install
+  aur_helper=$(aletheia-pkg-aur-helper)
+fi
 
 fzf_args=(
   --multi

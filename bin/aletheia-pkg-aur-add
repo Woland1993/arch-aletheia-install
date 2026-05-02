@@ -2,10 +2,10 @@
 
 # Add the named packages to the system from the AUR if they're missing. Returns false if it couldn't be done.
 
-aur_helper=$(aletheia-pkg-aur-helper 2>/dev/null) || {
-  echo "No AUR helper found (need yay or paru)" >&2
-  exit 1
-}
+if ! aur_helper=$(aletheia-pkg-aur-helper 2>/dev/null); then
+  aletheia-pkg-aur-helper --install
+  aur_helper=$(aletheia-pkg-aur-helper)
+fi
 
 if aletheia-pkg-missing "$@"; then
   "$aur_helper" -S --noconfirm --needed "$@" || exit 1

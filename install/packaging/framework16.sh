@@ -1,3 +1,3 @@
 if aletheia-hw-framework16; then
-  aletheia-pkg-add qmk-hid
+  aletheia-pkg-aur-add qmk-hid
 fi

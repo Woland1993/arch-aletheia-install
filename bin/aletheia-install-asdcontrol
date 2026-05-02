@@ -1,0 +1,16 @@
+#!/bin/bash
+
+set -e
+
+if command -v asdcontrol &>/dev/null; then
+  exit 0
+fi
+
+aletheia-pkg-add git gcc make
+
+tmp_dir=$(mktemp -d)
+trap 'rm -rf "$tmp_dir"' EXIT
+
+git clone https://github.com/nikosdion/asdcontrol.git "$tmp_dir/asdcontrol"
+make -C "$tmp_dir/asdcontrol"
+sudo make -C "$tmp_dir/asdcontrol" install

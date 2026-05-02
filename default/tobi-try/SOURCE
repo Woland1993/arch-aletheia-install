@@ -1,0 +1,5 @@
+Source: https://github.com/tobi/try
+Version: 1.8.2
+
+Bundled because the installed environment includes this tool, but it is not
+available from the official Arch repos under the same package name.

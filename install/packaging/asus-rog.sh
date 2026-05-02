@@ -1,3 +1,3 @@
 if aletheia-hw-asus-rog; then
-  aletheia-pkg-add asusctl
+  aletheia-pkg-aur-add asusctl
 fi

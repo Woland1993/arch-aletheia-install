@@ -2,9 +2,4 @@
 
 set -e
 
-if aletheia-pkg-aur-helper &>/dev/null; then
-  aletheia-pkg-aur-add aether
-else
-  echo "Aether requires an AUR helper (yay or paru)" >&2
-  exit 1
-fi
+aletheia-pkg-aur-add aether

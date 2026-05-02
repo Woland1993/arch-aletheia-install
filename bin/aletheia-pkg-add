@@ -14,7 +14,9 @@ for pkg in "$@"; do
 done
 
 if ((${#missing[@]} > 0)); then
-  echo -e "\033[33mSkipping unavailable packages: ${missing[*]}\033[0m" >&2
+  echo -e "\033[31mError: Packages unavailable in configured pacman repos: ${missing[*]}\033[0m" >&2
+  echo "Install AUR/upstream packages with aletheia-pkg-aur-add or a dedicated installer instead." >&2
+  exit 1
 fi
 
 if ((${#packages[@]} == 0)); then

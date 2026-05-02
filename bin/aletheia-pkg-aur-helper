@@ -1,9 +1,45 @@
 #!/bin/bash
 
+set -e
+
+install_helper=false
+
+case "${1:-}" in
+"")
+  ;;
+--install)
+  install_helper=true
+  ;;
+*)
+  echo "Usage: aletheia-pkg-aur-helper [--install]" >&2
+  exit 2
+  ;;
+esac
+
 if command -v yay &>/dev/null; then
   echo yay
 elif command -v paru &>/dev/null; then
   echo paru
-else
+elif ! $install_helper; then
   exit 1
+else
+  if [[ $EUID -eq 0 ]]; then
+    echo "AUR helpers must be built as a regular user, not root." >&2
+    exit 1
+  fi
+
+  sudo pacman -S --noconfirm --needed base-devel git go
+
+  tmp_dir=$(mktemp -d)
+  trap 'rm -rf "$tmp_dir"' EXIT
+
+  git clone https://aur.archlinux.org/yay.git "$tmp_dir/yay"
+  makepkg -Crsif --noconfirm --needed --dir "$tmp_dir/yay"
+
+  command -v yay >/dev/null || {
+    echo "yay did not become available after installation." >&2
+    exit 1
+  }
+
+  echo yay
 fi
